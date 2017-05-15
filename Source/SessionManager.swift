@@ -43,14 +43,14 @@ open class SessionManager {
 
     // MARK: - Properties
 
-    /// A default instance of `SessionManager`, used by top-level Alamofire request methods, and suitable for use
-    /// directly for any ad hoc requests.
-    open static let `default`: SessionManager = {
-        let configuration = URLSessionConfiguration.default
-        configuration.httpAdditionalHeaders = SessionManager.defaultHTTPHeaders
-
-        return SessionManager(configuration: configuration)
-    }()
+//    /// A default instance of `SessionManager`, used by top-level Alamofire request methods, and suitable for use
+//    /// directly for any ad hoc requests.
+//    open static let `default`: SessionManager = {
+//        let configuration = URLSessionConfiguration.default
+//        configuration.httpAdditionalHeaders = SessionManager.defaultHTTPHeaders
+//
+//        return SessionManager(configuration: configuration)
+//    }()
 
     /// Creates default values for the "Accept-Encoding", "Accept-Language" and "User-Agent" headers.
     open static let defaultHTTPHeaders: HTTPHeaders = {
@@ -667,7 +667,7 @@ open class SessionManager {
 
                 let isBackgroundSession = self.session.configuration.identifier != nil
 
-                if formData.contentLength < encodingMemoryThreshold && !isBackgroundSession {
+                // if formData.contentLength < encodingMemoryThreshold && !isBackgroundSession {
                     let data = try formData.encode()
 
                     let encodingResult = MultipartFormDataEncodingResult.success(
@@ -677,51 +677,51 @@ open class SessionManager {
                     )
 
                     DispatchQueue.main.async { encodingCompletion?(encodingResult) }
-                } else {
-                    let fileManager = FileManager.default
-                    let tempDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
-                    let directoryURL = tempDirectoryURL.appendingPathComponent("org.alamofire.manager/multipart.form.data")
-                    let fileName = UUID().uuidString
-                    let fileURL = directoryURL.appendingPathComponent(fileName)
-
-                    tempFileURL = fileURL
-
-                    var directoryError: Error?
-
-                    // Create directory inside serial queue to ensure two threads don't do this in parallel
-                    self.queue.sync {
-                        do {
-                            try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
-                        } catch {
-                            directoryError = error
-                        }
-                    }
-
-                    if let directoryError = directoryError { throw directoryError }
-
-                    try formData.writeEncodedData(to: fileURL)
-
-                    let upload = self.upload(fileURL, with: urlRequestWithContentType)
-
-                    // Cleanup the temp file once the upload is complete
-                    upload.delegate.queue.addOperation {
-                        do {
-                            try FileManager.default.removeItem(at: fileURL)
-                        } catch {
-                            // No-op
-                        }
-                    }
-
-                    DispatchQueue.main.async {
-                        let encodingResult = MultipartFormDataEncodingResult.success(
-                            request: upload,
-                            streamingFromDisk: true,
-                            streamFileURL: fileURL
-                        )
-
-                        encodingCompletion?(encodingResult)
-                    }
-                }
+//                } else {
+//                    let fileManager = FileManager.default
+//                    let tempDirectoryURL = URL(fileURLWithPath: NSTemporaryDirectory())
+//                    let directoryURL = tempDirectoryURL.appendingPathComponent("org.alamofire.manager/multipart.form.data")
+//                    let fileName = UUID().uuidString
+//                    let fileURL = directoryURL.appendingPathComponent(fileName)
+//
+//                    tempFileURL = fileURL
+//
+//                    var directoryError: Error?
+//
+//                    // Create directory inside serial queue to ensure two threads don't do this in parallel
+//                    self.queue.sync {
+//                        do {
+//                            try fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true, attributes: nil)
+//                        } catch {
+//                            directoryError = error
+//                        }
+//                    }
+//
+//                    if let directoryError = directoryError { throw directoryError }
+//
+//                    try formData.writeEncodedData(to: fileURL)
+//
+//                    let upload = self.upload(fileURL, with: urlRequestWithContentType)
+//
+//                    // Cleanup the temp file once the upload is complete
+//                    upload.delegate.queue.addOperation {
+//                        do {
+//                            try FileManager.default.removeItem(at: fileURL)
+//                        } catch {
+//                            // No-op
+//                        }
+//                    }
+//
+//                    DispatchQueue.main.async {
+//                        let encodingResult = MultipartFormDataEncodingResult.success(
+//                            request: upload,
+//                            streamingFromDisk: true,
+//                            streamFileURL: fileURL
+//                        )
+//
+//                        encodingCompletion?(encodingResult)
+//                    }
+//                }
             } catch {
                 // Cleanup the temp file in the event that the multipart form data encoding failed
                 if let tempFileURL = tempFileURL {

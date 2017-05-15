@@ -363,39 +363,39 @@ open class MultipartFormData {
         return encoded
     }
 
-    /// Writes the appended body parts into the given file URL.
-    ///
-    /// This process is facilitated by reading and writing with input and output streams, respectively. Thus,
-    /// this approach is very memory efficient and should be used for large body part data.
-    ///
-    /// - parameter fileURL: The file URL to write the multipart form data into.
-    ///
-    /// - throws: An `AFError` if encoding encounters an error.
-    public func writeEncodedData(to fileURL: URL) throws {
-        if let bodyPartError = bodyPartError {
-            throw bodyPartError
-        }
-
-        if FileManager.default.fileExists(atPath: fileURL.path) {
-            throw AFError.multipartEncodingFailed(reason: .outputStreamFileAlreadyExists(at: fileURL))
-        } else if !fileURL.isFileURL {
-            throw AFError.multipartEncodingFailed(reason: .outputStreamURLInvalid(url: fileURL))
-        }
-
-        guard let outputStream = OutputStream(url: fileURL, append: false) else {
-            throw AFError.multipartEncodingFailed(reason: .outputStreamCreationFailed(for: fileURL))
-        }
-
-        outputStream.open()
-        defer { outputStream.close() }
-
-        self.bodyParts.first?.hasInitialBoundary = true
-        self.bodyParts.last?.hasFinalBoundary = true
-
-        for bodyPart in self.bodyParts {
-            try write(bodyPart, to: outputStream)
-        }
-    }
+//    /// Writes the appended body parts into the given file URL.
+//    ///
+//    /// This process is facilitated by reading and writing with input and output streams, respectively. Thus,
+//    /// this approach is very memory efficient and should be used for large body part data.
+//    ///
+//    /// - parameter fileURL: The file URL to write the multipart form data into.
+//    ///
+//    /// - throws: An `AFError` if encoding encounters an error.
+//    public func writeEncodedData(to fileURL: URL) throws {
+//        if let bodyPartError = bodyPartError {
+//            throw bodyPartError
+//        }
+//
+//        if FileManager.default.fileExists(atPath: fileURL.path) {
+//            throw AFError.multipartEncodingFailed(reason: .outputStreamFileAlreadyExists(at: fileURL))
+//        } else if !fileURL.isFileURL {
+//            throw AFError.multipartEncodingFailed(reason: .outputStreamURLInvalid(url: fileURL))
+//        }
+//
+//        guard let outputStream = OutputStream(url: fileURL, append: false) else {
+//            throw AFError.multipartEncodingFailed(reason: .outputStreamCreationFailed(for: fileURL))
+//        }
+//
+//        outputStream.open()
+//        defer { outputStream.close() }
+//
+//        self.bodyParts.first?.hasInitialBoundary = true
+//        self.bodyParts.last?.hasFinalBoundary = true
+//
+//        for bodyPart in self.bodyParts {
+//            try write(bodyPart, to: outputStream)
+//        }
+//    }
 
     // MARK: - Private - Body Part Encoding
 
