@@ -156,7 +156,6 @@ open class SessionManager {
     /// Creates an instance with the specified `configuration`, `delegate` and `serverTrustPolicyManager`.
     ///
     /// - parameter configuration:            The configuration used to construct the managed session.
-    ///                                       `URLSessionConfiguration.default` by default.
     /// - parameter delegate:                 The delegate used when initializing the session. `SessionDelegate()` by
     ///                                       default.
     /// - parameter serverTrustPolicyManager: The server trust policy manager to use for evaluating all server trust
@@ -164,7 +163,7 @@ open class SessionManager {
     ///
     /// - returns: The new `SessionManager` instance.
     public init(
-        configuration: URLSessionConfiguration = URLSessionConfiguration.default,
+        configuration: URLSessionConfiguration,
         delegate: SessionDelegate = SessionDelegate(),
         serverTrustPolicyManager: ServerTrustPolicyManager? = nil)
     {
